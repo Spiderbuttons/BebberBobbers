@@ -1,16 +1,13 @@
-﻿using System;
+﻿// ReSharper disable MemberCanBePrivate.Global
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using BebberBobbers.Helpers;
-using Force.DeepCloner;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
-using StardewValley.Extensions;
 using StardewValley.Menus;
-using StardewValley.Tools;
 
 namespace BebberBobbers;
 
@@ -28,33 +25,34 @@ public class BobberBenu : IClickableMenu
     private const int DOWN_ARROW_ID = -4;
 
     private int MAX_ICONS_PER_ROW = 11;
-    private int MAX_ROWS = 5;
+    private readonly int MAX_ROWS;
     private int MAX_ICONS_PER_PAGE = 55;
-    private int START_INDEX = 0;
+    private int START_INDEX;
 
     public readonly List<ClickableTextureComponent> icons = [];
 
     [SkipForClickableAggregation]
     public readonly List<ClickableTextureComponent> iconFronts = [];
 
-    public ClickableTextureComponent UpArrow;
+    public ClickableTextureComponent? UpArrow;
 
-    public ClickableTextureComponent DownArrow;
+    public ClickableTextureComponent? DownArrow;
 
     private readonly int ICON_X_OFFSET = ICON_WIDTH / 2 - ICON_BACK_RECTANGLE.Width * 4 / 2 - 4;
 
     private int selected = -1;
 
-    private int pageNumber = 0;
+    private int pageNumber;
 
     private bool atMinPage = true;
     private bool atMaxPage = true;
 
-    private string titleText;
+    private readonly string TITLE_TEXT;
 
-    public BobberBenu()
+    public BobberBenu(int maxRows)
     {
-        titleText = Game1.content.LoadString("Strings\\1_6_Strings:ChooseBobber");
+        TITLE_TEXT = Game1.content.LoadString("Strings\\1_6_Strings:ChooseBobber");
+        MAX_ROWS = maxRows;
         setUpIcons();
     }
 
@@ -190,7 +188,7 @@ public class BobberBenu : IClickableMenu
         }
     }
 
-    public void setUpIcons()
+    private void setUpIcons()
     {
         icons.Clear();
         iconFronts.Clear();
@@ -335,24 +333,16 @@ public class BobberBenu : IClickableMenu
             upNeighborID = UP_ARROW_ID,
             downNeighborID = -999,
             leftNeighborID = -999,
+            rightNeighborID = -7777
         };
-        
-        int iconsOnThisPage = Math.Min(icons.Count - START_INDEX, MAX_ICONS_PER_ROW * MAX_ROWS);
-        int closestLowerMultiple = iconsOnThisPage - 1;
-        while (closestLowerMultiple % MAX_ICONS_PER_ROW != 0 && closestLowerMultiple >= 0)
-        {
-            closestLowerMultiple--;
-        }
-        // DownArrow.rightNeighborID = Math.Max(closestLowerMultiple, 0);
-        DownArrow.rightNeighborID = -7777;
 
         initialize(xPositionOnScreen, yPositionOnScreen, width, height, showUpperRightCloseButton: true);
-        if (Game1.options.SnappyMenus)
-        {
-            populateClickableComponentList();
-            if (currentlySnappedComponent is null) currentlySnappedComponent = getComponentWithID(0);
-            snapCursorToCurrentSnappedComponent();
-        }
+        
+        if (!Game1.options.SnappyMenus) return;
+        
+        populateClickableComponentList();
+        currentlySnappedComponent ??= getComponentWithID(0);
+        snapCursorToCurrentSnappedComponent();
     }
 
     public override void performHoverAction(int x, int y)
@@ -380,13 +370,13 @@ public class BobberBenu : IClickableMenu
         int maxIcons = maxIconsPerRow * maxRows;
         int startIndex = pageNumber * maxIconsPerRow * maxRows;
         
-        if (UpArrow.containsPoint(x, y))
+        if (UpArrow!.containsPoint(x, y))
         {
             PreviousPage();
             return;
         }
         
-        if (DownArrow.containsPoint(x, y))
+        if (DownArrow!.containsPoint(x, y))
         {
             NextPage();
             return;
@@ -423,12 +413,12 @@ public class BobberBenu : IClickableMenu
         b.Draw(Game1.fadeToBlackRect, new Rectangle(0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height),
             Color.Black * 0.7f);
         base.draw(b);
-        SpriteText.drawStringWithScrollCenteredAt(b, titleText,
+        SpriteText.drawStringWithScrollCenteredAt(b, TITLE_TEXT,
             xPositionOnScreen + width / 2, yPositionOnScreen + 20, "",
             1f, Game1.textColor);
 
-        UpArrow.draw(b, atMinPage ? Color.White * 0.4f : Color.White, 0.87f, 0, ICON_X_OFFSET);
-        DownArrow.draw(b, atMaxPage ? Color.White * 0.4f : Color.White, 0.87f, 0, ICON_X_OFFSET);
+        UpArrow?.draw(b, atMinPage ? Color.White * 0.4f : Color.White, 0.87f, 0, ICON_X_OFFSET);
+        DownArrow?.draw(b, atMaxPage ? Color.White * 0.4f : Color.White, 0.87f, 0, ICON_X_OFFSET);
         
         for (int i = 0; i < icons.Count; i++)
         {

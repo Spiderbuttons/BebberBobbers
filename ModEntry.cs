@@ -1,33 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Net;
-using BebberBobbers.Helpers;
+﻿using System.Collections.Generic;
 using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using StardewValley.Extensions;
-using StardewValley.GameData.Shops;
-using StardewValley.Menus;
 using StardewValley.Tools;
 
 namespace BebberBobbers
 {
     internal sealed class ModEntry : Mod
     {
-        internal static IModHelper ModHelper { get; set; } = null!;
-        internal static IMonitor ModMonitor { get; set; } = null!;
-        internal static Harmony Harmony { get; set; } = null!;
+        private static IModHelper ModHelper { get; set; } = null!;
+        internal static IMonitor ModMonitor { get; private set; } = null!;
+        private static Harmony Harmony { get; set; } = null!;
 
         private static List<BobberBata>? _bobbers;
 
         public static List<BobberBata> Bobbers => _bobbers ??=
             ModHelper.GameContent.Load<List<BobberBata>>("Spiderbuttons.BebberBobbers/Bobbers");
         
-        public static Dictionary<string, Texture2D> BobberTextureCache { get; } = new Dictionary<string, Texture2D>();
+        public static Dictionary<string, Texture2D> BobberTextureCache { get; } = new();
 
         public override void Entry(IModHelper helper)
         {
@@ -42,29 +34,18 @@ namespace BebberBobbers
             Helper.Events.Content.AssetReady += OnAssetReady;
             Helper.Events.Content.AssetsInvalidated += OnAssetsInvalidated;
             
-            Helper.Events.Display.MenuChanged += OnMenuChanged;
-            
             GameLocation.RegisterTileAction("Bobbers", (_, _, _, _) =>
             {
-                Game1.activeClickableMenu = new BobberBenu();
+                Game1.activeClickableMenu = new BobberBenu(5);
                 return true;
             });
         }
 
-        private void OnMenuChanged(object? sender, MenuChangedEventArgs e)
-        {
-            //
-        }
-
         private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
         {
-            // if (!Context.IsWorldReady)
-            //     return;
-
             if (e.Button is SButton.F2)
             {
-                Harmony.UnpatchAll(ModManifest.UniqueID);
-                Harmony.PatchAll();
+                //
             }
         }
 
@@ -98,7 +79,7 @@ namespace BebberBobbers
             }
         }
 
-        public int GetBobberCount()
+        private int GetBobberCount()
         {
             return Bobbers.Count;
         }
