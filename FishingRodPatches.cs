@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Emit;
 using BebberBobbers.Helpers;
@@ -55,7 +54,6 @@ public static class FishingRodPatches
                 __instance.getLastFarmerToUse().FacingDirection == 1
                     ? SpriteEffects.FlipHorizontally
                     : SpriteEffects.None, bobberLayerDepth);
-            position = new Rectangle(position.X, position.Y + 8, position.Width, position.Height - 8);
         }
     }
     
@@ -117,14 +115,7 @@ public static class FishingRodPatches
 
         styleIndex -= 40;
         var selectedBobber = ModEntry.Bobbers[styleIndex];
-        if (selectedBobber.FlipWhenFacingRight)
-        {
-            __result = true;
-        }
-        else
-        {
-            __result = false;
-        }
+        __result = selectedBobber.FlipWhenFacingRight;
     }
 
     [HarmonyTranspiler]
