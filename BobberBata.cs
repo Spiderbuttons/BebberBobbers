@@ -9,6 +9,6 @@ public class BobberBata
     public int SpriteIndex = 0;
     public string? Condition;
     public bool FlipWhenFacingRight;
-    public string? FishingLineColor;
     public string? FishingLineColour;
+    public string? FishingLineColor;
 }
