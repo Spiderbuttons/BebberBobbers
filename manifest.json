@@ -2,8 +2,8 @@
     "Name": "BebberBobbers",
     "Author": "Spiderbuttons",
     "Version": "1.0.0",
-    "Description": "A template for a Stardew Valley mod.",
+    "Description": "Allows mod authors to add more bobber styles to the game!",
     "UniqueID": "Spiderbuttons.BebberBobbers",
     "EntryDll": "BebberBobbers.dll",
-    "UpdateKeys": []
+    "UpdateKeys": [ "Nexus:36655" ]
 }
